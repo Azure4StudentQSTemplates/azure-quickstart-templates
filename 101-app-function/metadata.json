@@ -10,7 +10,7 @@
       "subscriptiontype": "Azure4Student",
       "resource":"appServices, Function",
       "os": "serverless",
-      "level": "Begginer",
+      "level": "Beginner",
       "cost": "$0"
   }
 }

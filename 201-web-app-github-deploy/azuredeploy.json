@@ -1,12 +1,12 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.1",
     "parameters": {
         "webAppName": {
-            "type": "string",
-            "defaultValue": "[concat('WebApp-', uniqueString(resourceGroup().name, utcNow('F')))]",
+           "type": "string",
+           "defaultValue": "[concat('WebApp-', uniqueString(resourceGroup().name, utcNow('F')))]",
             "metadata": {
-                "description": "That name is the name of our application. It has to be unique.Type a name followed by your resource group name. (<name>-<resourceGroupName>)"
+                "description": "The name of you Web Site."
             }
         },
         "location": {
@@ -51,6 +51,7 @@
         },
         "repoURL": {
             "type": "string",
+            "defaultValue": "https://github.com/Azure/azure-quickstart-templates.git",
             "metadata": {
                 "description": "The URL for the GitHub repository that contains the project to deploy."
             }
