@@ -11,9 +11,9 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "storageAccountName": "[concat('stoacc',  substring(toLower(replace(parameters('workspaceName'),'-', '')),0,7))]",
+    "storageAccountName": "[concat(toLower(replace(resourceGroup().name,'-', '')), 'san')]",
     "storageAccountType": "Standard_LRS",
-    "keyVaultName": "[concat('keyvault', substring(toLower(replace(parameters('workspaceName'),'-', '')),0,14))]",
+    "keyVaultName": "[concat(toLower(replace(resourceGroup().name,'-', '')), 'keyvault')]",
     "tenantId": "[subscription().tenantId]",
     "applicationInsightsName": "[concat('appi',parameters('workspaceName'))]"
   },
