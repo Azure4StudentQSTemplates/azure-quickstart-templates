@@ -1,11 +1,19 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": { 
+    "parameters": {
         "webAppName": {
             "type": "string",
+            "defaultValue": "[concat('WebApp-', uniqueString(resourceGroup().id))]",
             "metadata": {
-                "description": "Gloabally unique name of azure web app"
+                "description": "Specifies the name of the webApp."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
             }
         },
         "appId": {
@@ -15,20 +23,25 @@
             "type": "string"
         }
     },
-
     "variables": {
-        "location": "[resourceGroup().location]",
-        "serverFarmName": "[concat(parameters('webAppName'), '-serverFarm')]",
-        "siteName": "[concat(parameters('webAppName'), '-siteName')]"
+        "sku": "Free",
+        "skuCode": "F1",
+        "workerSize": "0",
+        "applicationInsightsName": "[concat('ai',uniqueString(resourceGroup().id))]",
+        "hostingPlanName": "[concat('hpn-', uniqueString(resourceGroup().id))]"
     },
-
     "resources": [
-        
         {
             "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2016-09-01",
-            "name": "[variables('serverFarmName')]",
-            "location": "[variables('location')]",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "name": "[variables('hostingPlanName')]",
+                "workerSizeId": "[variables('workerSize')]",
+                "reserved": true,
+                "numberOfWorkers": "1"
+            },
             "sku": {
                 "name": "S1",
                 "tier": "Standard",
@@ -36,88 +49,47 @@
                 "family": "S",
                 "capacity": 1
             },
-            "kind": "app",
-            "properties": {
-                "name": "[variables('serverFarmName')]",
-                "perSiteScaling": false,
-                "reserved": false,
-                "targetWorkerCount": 0,
-                "targetWorkerSizeId": 0
-            }
+            "kind": "app"
         },
-
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
-            "name": "[variables('siteName')]",
-            "location": "[variables('location')]",
+            "name": "[parameters('webAppName')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
             ],
             "kind": "app",
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(variables('siteName'), '.azurewebsites.net')]",
+                        "name": "[concat(parameters('webAppName'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(variables('siteName'), '.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('webAppName'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]",
-                "reserved": false,
-                "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": true,
-                "clientCertEnabled": false,
-                "hostNamesDisabled": false,
-                "containerSize": 0,
-                "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
             }
         },
-
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2016-08-01",
-            "name": "[concat(variables('siteName'), '/web')]",
-            "location": "[variables('location')]",
+            "name": "[concat(parameters('webAppName'), '/web')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
             ],
             "properties": {
                 "numberOfWorkers": 1,
-                "defaultDocuments": [
-                    "Default.htm",
-                    "Default.html",
-                    "Default.asp",
-                    "index.htm",
-                    "index.html",
-                    "iisstart.htm",
-                    "default.aspx",
-                    "index.php",
-                    "hostingstart.html"
-                ],
-                "netFrameworkVersion": "v4.0",
-                "phpVersion": "5.6",
-                "pythonVersion": "",
-                "nodeVersion": "",
-                "linuxFxVersion": "",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
-                "httpLoggingEnabled": false,
-                "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$uks-mychatbot3",
-                "scmType": "None",
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": true,
                 "alwaysOn": false,
-                "appCommandLine": "",
                 "managedPipelineMode": "Integrated",
                 "virtualApplications": [
                     {
@@ -129,40 +101,9 @@
                 ],
                 "winAuthAdminState": 0,
                 "winAuthTenantState": 0,
-                "customAppPoolIdentityAdminState": false,
-                "customAppPoolIdentityTenantState": false,
-                "loadBalancing": "LeastRequests",
-                "routingRules": [],
-                "experiments": {
-                    "rampUpRules": []
-                },
-                "autoHealEnabled": false,
-                "vnetName": "",
-                "siteAuthEnabled": false,
                 "siteAuthSettings": {
-                    "enabled": null,
-                    "unauthenticatedClientAction": null,
-                    "tokenStoreEnabled": null,
-                    "allowedExternalRedirectUrls": null,
-                    "defaultProvider": null,
-                    "clientId": null,
-                    "clientSecret": null,
-                    "clientSecretCertificateThumbprint": null,
-                    "issuer": null,
-                    "allowedAudiences": null,
-                    "additionalLoginParams": null,
-                    "isAadAutoProvisioned": false,
-                    "googleClientId": null,
-                    "googleClientSecret": null,
-                    "googleOAuthScopes": null,
-                    "facebookAppId": null,
-                    "facebookAppSecret": null,
-                    "facebookOAuthScopes": null,
-                    "twitterConsumerKey": null,
-                    "twitterConsumerSecret": null,
                     "microsoftAccountClientId": "[parameters('appId')]",
-                    "microsoftAccountClientSecret": "[parameters('appSecret')]",
-                    "microsoftAccountOAuthScopes": null
+                    "microsoftAccountClientSecret": "[parameters('appSecret')]"
                 },
                 "cors": {
                     "allowedOrigins": [
@@ -171,37 +112,29 @@
                         "https://hosting.onecloud.azure-test.net/"
                     ],
                     "supportCredentials": false
-                },
-                "localMySqlEnabled": false,
-                "http20Enabled": false,
-                "minTlsVersion": "1.2",
-                "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0,
-                "fileChangeAuditEnabled": false
+                }
             }
         },
-
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2016-08-01",
-            "name": "[concat(variables('siteName'), '/', variables('siteName'), '.azurewebsites.net')]",
-            "location": "[variables('location')]",
+            "name": "[concat(parameters('webAppName'), '/', parameters('webAppName'), '.azurewebsites.net')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
             ],
             "properties": {
-                "siteName": "[variables('siteName')]",
+                "siteName": "[parameters('webAppName')]",
                 "hostNameType": "Verified"
             }
         },
-        
-       {
+        {
             "type": "Microsoft.BotService/botServices",
             "apiVersion": "2018-07-12",
             "name": "[parameters('webAppName')]",
             "location": "global",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites/', variables('siteName'))]"
+                "[resourceId('Microsoft.Web/sites/', parameters('webAppName'))]"
             ],
             "sku": {
                 "name": "F0"
@@ -211,20 +144,28 @@
                 "displayName": "[parameters('webAppName')]",
                 "iconUrl": "https://docs.botframework.com/static/devportal/client/images/bot-framework-default.png",
                 "endpoint": "[concat('https://', parameters('webAppName'), '.azurewebsites.net/api/messages')]",
-                "msaAppId": "[parameters('appId')]",
-                "luisAppIds": []
+                "msaAppId": "[parameters('appId')]"
             }
         },
-
         {
-            "name": "[concat(parameters('webAppName'), '/WebChatChannel')]",
             "type": "Microsoft.BotService/botServices/channels",
             "apiVersion": "2018-07-12",
+            "name": "[concat(parameters('webAppName'), '/WebChatChannel')]",
             "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.BotService/botServices', parameters('webAppName'))]"
-            ],
+                "dependsOn": [
+                    "[resourceId('Microsoft.BotService/botServices', parameters('webAppName'))]"
+                ],
             "properties": {}
-        }
-     ]
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2018-05-01-preview",
+            "name": "[variables('applicationInsightsName')]",
+            "location": "[if(or(equals(parameters('location'),'eastus2'),equals(parameters('location'),'westcentralus')),'southcentralus',parameters('location'))]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        }   
+    ]
 }
