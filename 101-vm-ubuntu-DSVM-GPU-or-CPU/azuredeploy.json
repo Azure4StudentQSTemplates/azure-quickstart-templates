@@ -30,6 +30,7 @@
         },
         "Cpu-Gpu": {
             "type": "string",
+            "defaultValue": "cpu",
             "allowedValues": [
                 "cpu",
                 "gpu"
@@ -58,6 +59,24 @@
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
+        },
+        "virtualMachineSizeCPU": {
+            "type": "string",
+            "defaultValue": "Standard_DS1_v2",
+            "allowedValues": [
+                "Standard_DS1_v2"
+            ],
+            "metadata":{
+                "description": "CPU VM size."
+            }
+        },
+        "virtualMachineSizeGPU": {
+            "type": "string",
+            "defaultValue": "Standard_NC6_Promo",
+            "allowedValues": ["Standard_NC6_Promo"],
+            "metadata":{
+                "description": "GPU VM size."
+            }
         }
     },
     "variables": {
@@ -65,14 +84,11 @@
         "virtualMachineName": "[parameters('vmName')]",
         "publicIpAddressName": "[concat(parameters('vmName'), 'PublicIP' )]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
+        "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
         "osDiskType": "Standard_LRS",
-        "virtualMachineSizeCPU": "Standard_DS1_v2",
-        "virtualMachineSizeGPU": "Standard_NC6_Promo",
-        "rgname": "[toLower(resourceGroup().name)]",
-        "diagnosticsStorageAccountName": "[concat(variables('rgname'), 'diag')]",
-        "diagnosticsStorageAccountType": "Standard_LRS",
-        "diagnosticsStorageAccountKind": "Storage"
+        "storageAccountName": "[concat('storage', uniqueString(resourceGroup().id))]",
+        "storageAccountType": "Standard_LRS",
+        "storageAccountKind": "Storage"
     },
     "resources": [
         {
@@ -95,7 +111,7 @@
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": {
-                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
                             }
                         }
                     }
@@ -119,8 +135,6 @@
                         "protocol": "TCP",
                         "access": "Allow",
                         "direction": "Inbound",
-                        "sourceApplicationSecurityGroups": [],
-                        "destinationApplicationSecurityGroups": [],
                         "sourceAddressPrefix": "*",
                         "sourcePortRange": "*",
                         "destinationAddressPrefix": "*",
@@ -134,8 +148,6 @@
                         "protocol": "TCP",
                         "access": "Allow",
                         "direction": "Inbound",
-                        "sourceApplicationSecurityGroups": [],
-                        "destinationApplicationSecurityGroups": [],
                         "sourceAddressPrefix": "*",
                         "sourcePortRange": "*",
                         "destinationAddressPrefix": "*",
@@ -149,8 +161,6 @@
                         "protocol": "TCP",
                         "access": "Allow",
                         "direction": "Inbound",
-                        "sourceApplicationSecurityGroups": [],
-                        "destinationApplicationSecurityGroups": [],
                         "sourceAddressPrefix": "*",
                         "sourcePortRange": "*",
                         "destinationAddressPrefix": "*",
@@ -176,7 +186,6 @@
                         "name": "[parameters('subnetName')]",
                         "properties": {
                             "addressPrefix": "10.0.0.0/24",
-                            "delegations": [],
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
@@ -198,14 +207,14 @@
             }
         },
         {
-            "name": "[variables('diagnosticsStorageAccountName')]",
+            "name": "[variables('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[parameters('location')]",
             "properties": {},
-            "kind": "[variables('diagnosticsStorageAccountKind')]",
+            "kind": "[variables('storageAccountKind')]",
             "sku": {
-                "name": "[variables('diagnosticsStorageAccountType')]"
+                "name": "[variables('storageAccountType')]"
             }
         },
         {
@@ -216,11 +225,11 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('virtualMachineSizeCPU')]"
+                    "vmSize": "[parameters('virtualMachineSizeCPU')]"
                 },
                 "storageProfile": {
                     "osDisk": {
@@ -258,11 +267,11 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('virtualMachineSizeGPU')]"
+                    "vmSize": "[parameters('virtualMachineSizeGPU')]"
                 },
                 "storageProfile": {
                     "osDisk": {
