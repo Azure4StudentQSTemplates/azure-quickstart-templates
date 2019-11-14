@@ -1,17 +1,16 @@
 {
     "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+    "itemDisplayName": "Azure Bot Service",
+    "description": "Creates a WebApp Chat Bot using Azure Bot Service. It also deploys App Service plan, App Service and Application Insights.",
+    "summary": "Creates a WebApp Chat Bot using Azure Bot Service.",
+    "githubUsername": "leestott",
+    "dateUpdated": "2019-11-12",
     "type": "QuickStart",
-    "itemDisplayName": "ChatBot",
-    "description": "This template allows you to create an App Service for deploying a ChatBot.",
-    "summary": "Deploy an WebSite with ChatBot service.",
-    "githubUsername": "",
-    "tags":[
-      "Azure4Student",
-      "app services",
-      "web app",
-      "sites",
-      "Beginner",
-      "$"
-    ],
-    "dateUpdated": "2019-10-05"
-  }
+    "tags": {
+        "subscriptiontype": "Azure4Student",
+        "resource":"chatbot",
+        "os": "web",
+        "level": "Begginer",
+        "cost": "$0"
+   }
+}
