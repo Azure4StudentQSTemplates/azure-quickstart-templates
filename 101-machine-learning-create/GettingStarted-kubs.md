@@ -32,7 +32,7 @@ To create your own App ID, follow the steps below.
 
 1. Using your favorite web browser sign in to the [Azure Portal](https://portal.azure.com/).
 
-2. Go to **All Services** and search for **app registrations**. You can favorite this service by clicking on the star. 
+2. Go to **All Services** and search for **app registrations**. You can favorite this service by clicking on the star.
 ![Screen](./images/azappreg.png)
 
 3. Go to the app registrations blade and click **New registration** in the action bar at the top.
@@ -118,7 +118,7 @@ To create the Resource group, type the command:
 
 ![Screen](./images/azgroup.png)
 
-Super simple, right? Now that we have our **Resource Group** created, let's deploy the **Web App Bot** using the az cli.
+Super simple, right? Now that we have our **Resource Group** created, let's deploy the **AKS Cluster** using the az cli.
 
 #### az group deployment create --name "name of your deployment" --resource-group "resource-group" --template-file "./azuredeploy.json"
 
@@ -147,6 +147,10 @@ Click on the Resource Group to expand and show the **Resources**:
 Click on the Kubernetes service.
 
 On this blade an overview of Kubernetes service.
+
+Also you have another Resource Group created with all the VMs that the **AKS cluster** created.
+
+![Screen](./images/azdeployportal2.png)
 
 Congratulations, you have deployed an **AKS Cluster** and that is just the tip of the Iceberg.
 
@@ -178,13 +182,13 @@ Select [I agree] and click on [Purchase].
 
 As you can see, it's deploying.
 
-After a couple of minutes, voilà, you have your **Azure Bot Service** deployed.
+After a couple of minutes, voilà, you have your **AKS Cluster** deployed.
 
 ![Screen](./images/azportaldeploy3.png)
 
 Go to the Resource and check your Cluster.
 
-**p.s.: It's pretty easy to create resources on Azure, right? But if you are the sort of IT guy that always loves automation, here is the surprise. Just click on the button below and it will automatically deploy Azure Bot Service through the Azure Portal.**
+**p.s.: It's pretty easy to create resources on Azure, right? But if you are the sort of IT guy that always loves automation, here is the surprise. Just click on the button below and it will automatically deploy AKS Cluster through the Azure Portal.**
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-quickstart-templates%2Fmaster%2201-aks%2Fazuredeploy.json" target="_blank">
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.png"/>
