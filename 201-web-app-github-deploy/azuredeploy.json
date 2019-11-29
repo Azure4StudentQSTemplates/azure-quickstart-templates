@@ -4,7 +4,7 @@
     "parameters": {
         "siteName": {
            "type": "string",
-           "defaultValue": "[concat('WebApp-', uniqueString(resourceGroup().name))]",
+           "defaultValue": "[concat('WebApp-', uniqueString(resourceGroup().id))]",
             "metadata": {
                 "description": "The name of you Web Site."
             }
@@ -51,7 +51,7 @@
         },
         "repoURL": {
             "type": "string",
-            "defaultValue": "https://github.com/Krisnatagoras/templates.git",
+            "defaultValue": "https://github.com/Microsoft/project-html-website",
             "metadata": {
                 "description": "The URL for the GitHub repository that contains the project to deploy."
             }
